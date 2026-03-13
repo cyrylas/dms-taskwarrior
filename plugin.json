@@ -1,0 +1,12 @@
+{
+    "id": "taskwarrior",
+    "name": "Taskwarrior",
+    "description": "Show pending Taskwarrior tasks sorted by urgency",
+    "version": "1.0.0",
+    "author": "cyrylas",
+    "icon": "task_alt",
+    "type": "widget",
+    "capabilities": ["dankbar-widget"],
+    "component": "./TaskwarriorWidget.qml",
+    "permissions": ["process"]
+}
