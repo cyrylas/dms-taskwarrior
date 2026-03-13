@@ -2,6 +2,8 @@
 
 A DankMaterialShell bar widget that shows your pending Taskwarrior tasks sorted by urgency.
 
+![Screenshot](screenshots/screenshot-dark.png)
+
 ## Features
 
 - Displays pending task count in the bar (horizontal and vertical layouts)
