@@ -33,20 +33,20 @@ PluginComponent {
         id: doneProcessComponent
 
         Process {
-            property int taskId: 0
-            command: ["task", taskId.toString(), "done"]
+            property string taskUuid: ""
+            command: ["task", taskUuid.toString(), "done"]
 
             onExited: (exitCode) => {
                 if (exitCode !== 0)
-                    console.error("[taskwarrior] failed to complete task", taskId)
+                    console.error("[taskwarrior] failed to complete task", taskUuid)
                 taskProcess.running = true
                 destroy()
             }
         }
     }
 
-    function markDone(id) {
-        const p = doneProcessComponent.createObject(root, { taskId: id })
+    function markDone(uuid) {
+        const p = doneProcessComponent.createObject(root, { taskUuid: uuid })
         if (p) p.running = true
     }
 
@@ -247,7 +247,7 @@ PluginComponent {
                                 tooltipText: "Mark done"
                                 tooltipSide: "left"
                                 anchors.verticalCenter: parent.verticalCenter
-                                onClicked: root.markDone(modelData.id)
+                                onClicked: root.markDone(modelData.uuid)
                             }
                         }
                     }
