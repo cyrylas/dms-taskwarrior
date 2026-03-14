@@ -29,6 +29,27 @@ PluginComponent {
     property var tasks: []
     readonly property int pendingCount: tasks.length
 
+    Component {
+        id: doneProcessComponent
+
+        Process {
+            property int taskId: 0
+            command: ["task", taskId.toString(), "done"]
+
+            onExited: (exitCode) => {
+                if (exitCode !== 0)
+                    console.error("[taskwarrior] failed to complete task", taskId)
+                taskProcess.running = true
+                destroy()
+            }
+        }
+    }
+
+    function markDone(id) {
+        const p = doneProcessComponent.createObject(root, { taskId: id })
+        if (p) p.running = true
+    }
+
     Process {
         id: taskProcess
         running: false
@@ -146,7 +167,7 @@ PluginComponent {
                             }
 
                             Column {
-                                width: parent.width - 8 - Theme.spacingM
+                                width: parent.width - 8 - 28 - Theme.spacingM * 2
                                 spacing: 2
 
                                 StyledText {
@@ -218,6 +239,15 @@ PluginComponent {
                                         }
                                     }
                                 }
+                            }
+                            DankActionButton {
+                                iconName: "check_circle"
+                                iconColor: Theme.primary
+                                buttonSize: 28
+                                tooltipText: "Mark done"
+                                tooltipSide: "left"
+                                anchors.verticalCenter: parent.verticalCenter
+                                onClicked: root.markDone(modelData.id)
                             }
                         }
                     }
