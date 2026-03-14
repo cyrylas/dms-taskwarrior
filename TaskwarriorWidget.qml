@@ -4,6 +4,7 @@ import Quickshell.Io
 import qs.Common
 import qs.Widgets
 import qs.Modules.Plugins
+import "translations.js" as Tr
 
 PluginComponent {
     id: root
@@ -12,6 +13,9 @@ PluginComponent {
     property var tasks: []
     readonly property int pendingCount: tasks.length
     property bool showAddInput: false
+    readonly property string lang: Qt.locale().name.split(/[_-]/)[0]
+    function tr(key) { return Tr.tr(key, lang) }
+    function trn(key, count) { return Tr.trn(key, count, lang) }
 
     function formatDue(raw) {
         if (!raw) return ""
@@ -21,13 +25,13 @@ PluginComponent {
         )
         const diffMin = Math.round((due - new Date()) / 60000)
         if (diffMin < -2880) return Math.round(diffMin / 1440) + "d"
-        if (diffMin < -1440) return "yesterday"
+        if (diffMin < -1440) return tr("yesterday")
         if (diffMin < -60)   return Math.round(diffMin / 60) + "h"
         if (diffMin < 0)     return diffMin + "min"
-        if (diffMin < 1)     return "now"
+        if (diffMin < 1)     return tr("now")
         if (diffMin < 60)    return diffMin + "min"
         if (diffMin < 1440)  return Math.round(diffMin / 60) + "h"
-        if (diffMin < 2880)  return "tomorrow"
+        if (diffMin < 2880)  return tr("tomorrow")
         return Math.round(diffMin / 1440) + "d"
     }
 
@@ -146,8 +150,8 @@ PluginComponent {
 
     popoutContent: Component {
         PopoutComponent {
-            headerText: "Tasks"
-            detailsText: root.pendingCount + " pending"
+            headerText: tr("Tasks")
+            detailsText: trn("%{count} pending", root.pendingCount)
             showCloseButton: true
 
             headerActions: Component {
@@ -157,7 +161,7 @@ PluginComponent {
                         iconName: "add"
                         iconColor: Theme.surfaceVariantText
                         buttonSize: 28
-                        tooltipText: "Add task"
+                        tooltipText: tr("Add task")
                         tooltipSide: "bottom"
                         onClicked: {
                             root.showAddInput = !root.showAddInput
@@ -168,7 +172,7 @@ PluginComponent {
                         iconName: "refresh"
                         iconColor: Theme.surfaceVariantText
                         buttonSize: 28
-                        tooltipText: "Refresh"
+                        tooltipText: tr("Refresh")
                         tooltipSide: "bottom"
                         onClicked: taskProcess.running = true
                     }
@@ -186,7 +190,7 @@ PluginComponent {
 
                     DankTextField {
                         id: addInput
-                        placeholderText: "e.g. Buy milk +shopping priority:H"
+                        placeholderText: tr("e.g. Buy milk +shopping priority:H")
                         width: parent.width - submitBtn.width - parent.spacing
                         Keys.onReturnPressed: root.submitTask(addInput)
                         Keys.onEscapePressed: {
@@ -197,7 +201,7 @@ PluginComponent {
 
                     DankButton {
                         id: submitBtn
-                        text: "Add"
+                        text: tr("Add")
                         onClicked: root.submitTask(addInput)
                     }
                 }
@@ -309,7 +313,7 @@ PluginComponent {
                                 iconName: "check_circle"
                                 iconColor: Theme.primary
                                 buttonSize: 28
-                                tooltipText: "Mark done"
+                                tooltipText: tr("Mark done")
                                 tooltipSide: "left"
                                 anchors.verticalCenter: parent.verticalCenter
                                 onClicked: root.markDone(modelData.uuid)

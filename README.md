@@ -50,7 +50,6 @@ For issues, questions, or feature requests:
 
 ## Roadmap
 
-- [ ] Translations
 - [ ] Filter/search tasks
 - [ ] Group tasks by tags
 
