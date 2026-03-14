@@ -6,14 +6,10 @@ A DankMaterialShell bar widget that shows your pending Taskwarrior tasks sorted 
 
 ## Features
 
-- Displays pending task count in the bar (horizontal and vertical layouts)
-- Popout panel showing top 10 tasks sorted by urgency
-- Urgency dot indicator (red for high urgency ≥10, amber for ≥5, primary color otherwise)
-- Priority badges (H/M/L) color-coded by severity
-- Relative due dates (e.g. `2h`, `tomorrow`, `3d`) with overdue tasks highlighted in red
-- Tag pills for each task
-- Manual refresh button in popout header
-- Auto-refreshes every 60 seconds
+- Pending task count in the bar (horizontal and vertical layouts)
+- Show top 10 tasks sorted by urgency
+- Add new tasks using Taskwarrior syntax (e.g. `Buy milk +shopping priority:H`)
+- Mark tasks as done with a single click
 
 ## Requirements
 
@@ -54,8 +50,7 @@ For issues, questions, or feature requests:
 
 ## Roadmap
 
-- [ ] Transations
-- [ ] Mark tasks as completed
-- [ ] Add tasks
+- [ ] Translations
+- [ ] Filter/search tasks
 - [ ] Group tasks by tags
 
