@@ -7,6 +7,11 @@ import qs.Modules.Plugins
 
 PluginComponent {
     id: root
+    layerNamespacePlugin: "taskwarrior"
+
+    property var tasks: []
+    readonly property int pendingCount: tasks.length
+    property bool showAddInput: false
 
     function formatDue(raw) {
         if (!raw) return ""
@@ -26,8 +31,22 @@ PluginComponent {
         return Math.round(diffMin / 1440) + "d"
     }
 
-    property var tasks: []
-    readonly property int pendingCount: tasks.length
+    function markDone(uuid) {
+        const p = doneProcessComponent.createObject(root, { taskUuid: uuid })
+        if (p) p.running = true
+    }
+
+    function addTask(args) {
+        if (args.trim().length === 0) return
+        const p = addTaskProcessComponent.createObject(root, { args: args })
+        if (p) p.running = true
+    }
+
+    function submitTask(inputField) {
+        root.addTask(inputField.text)
+        inputField.text = ""
+        root.showAddInput = false
+    }
 
     Component {
         id: doneProcessComponent
@@ -45,9 +64,18 @@ PluginComponent {
         }
     }
 
-    function markDone(uuid) {
-        const p = doneProcessComponent.createObject(root, { taskUuid: uuid })
-        if (p) p.running = true
+    Component {
+        id: addTaskProcessComponent
+        Process {
+            property string args: ""
+            command: ["task", "add"].concat(args.trim().split(/\s+/).filter(s => s.length > 0))
+            onExited: (exitCode) => {
+                if (exitCode !== 0)
+                    console.error("[taskwarrior] failed to add task")
+                taskProcess.running = true
+                destroy()
+            }
+        }
     }
 
     Process {
@@ -123,19 +151,56 @@ PluginComponent {
             showCloseButton: true
 
             headerActions: Component {
-                DankActionButton {
-                    iconName: "refresh"
-                    iconColor: Theme.surfaceVariantText
-                    buttonSize: 28
-                    tooltipText: "Refresh"
-                    tooltipSide: "bottom"
-                    onClicked: taskProcess.running = true
+                Row {
+                    spacing: 4
+                    DankActionButton {
+                        iconName: "add"
+                        iconColor: Theme.surfaceVariantText
+                        buttonSize: 28
+                        tooltipText: "Add task"
+                        tooltipSide: "bottom"
+                        onClicked: {
+                            root.showAddInput = !root.showAddInput
+                            if (!root.showAddInput) addInput.text = ""
+                        }
+                    }
+                    DankActionButton {
+                        iconName: "refresh"
+                        iconColor: Theme.surfaceVariantText
+                        buttonSize: 28
+                        tooltipText: "Refresh"
+                        tooltipSide: "bottom"
+                        onClicked: taskProcess.running = true
+                    }
                 }
             }
 
             Column {
                 width: parent.width
                 spacing: Theme.spacingS
+
+                Row {
+                    visible: root.showAddInput
+                    width: parent.width
+                    spacing: 4
+
+                    DankTextField {
+                        id: addInput
+                        placeholderText: "e.g. Buy milk +shopping priority:H"
+                        width: parent.width - submitBtn.width - parent.spacing
+                        Keys.onReturnPressed: root.submitTask(addInput)
+                        Keys.onEscapePressed: {
+                            root.showAddInput = false
+                            addInput.text = ""
+                        }
+                    }
+
+                    DankButton {
+                        id: submitBtn
+                        text: "Add"
+                        onClicked: root.submitTask(addInput)
+                    }
+                }
 
                 Repeater {
                     model: root.tasks.slice(0, 10)
